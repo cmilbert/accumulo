@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This config is for IntelliJ and JUnit tests to look at -->
+<Configuration status="INFO">
+    <Appenders>
+        <Console name="OUT" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{DATE} [%p] %X{AWSRequestId} (%t) %C:%L: %m%n"/>
+        </Console>
+    </Appenders>
+
+    <Loggers>
+        <Root level="INFO">
+            <AppenderRef ref="OUT"/>
+        </Root>
+        <Logger name="com.amazon.morocco" level="DEBUG"/>
+        <Logger name="com.amazonaws.services.dynamodbv2.local" level="WARN"/>
+        <Logger name="com.amazon.coral.model.validation.OrphanOperationsValidator" level="ERROR"/>
+        <Logger name="org.apache.hadoop.util.NativeCodeLoader" level="ERROR"/>
+    </Loggers>
+</Configuration>
