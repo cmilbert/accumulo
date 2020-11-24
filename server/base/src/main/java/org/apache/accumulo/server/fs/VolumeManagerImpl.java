@@ -40,7 +40,6 @@ import org.apache.accumulo.core.volume.NonConfiguredVolume;
 import org.apache.accumulo.core.volume.Volume;
 import org.apache.accumulo.core.volume.VolumeConfiguration;
 import org.apache.accumulo.server.fs.VolumeChooser.VolumeChooserException;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.ContentSummary;
@@ -487,11 +486,12 @@ public class VolumeManagerImpl implements VolumeManager {
     final String choice;
     choice = chooser.choose(env, options);
 
-    if (!(ArrayUtils.contains(options, choice))) {
-      String msg = "The configured volume chooser, '" + chooser.getClass()
-          + "', or one of its delegates returned a volume not in the set of options provided";
-      throw new VolumeChooserException(msg);
-    }
+    /*
+     * if (!(ArrayUtils.contains(options, choice))) { String msg =
+     * "The configured volume chooser, '" + chooser.getClass() +
+     * "', or one of its delegates returned a volume not in the set of options provided"; throw new
+     * VolumeChooserException(msg); }
+     */
 
     return choice;
   }

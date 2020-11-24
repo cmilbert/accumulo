@@ -62,7 +62,10 @@ public class PreferredVolumeChooser extends RandomVolumeChooser {
         // TODO should be possible to read from SiteConfiguration during init
         log.warn("Not possible to determine preferred volumes at '{}' scope. Using all volumes.",
             ChooserScope.INIT);
-        return options;
+        log.error("Received options: {}", Arrays.toString(options));
+        return Arrays.stream(options)
+            .filter(opt -> opt.startsWith("file:") || opt.startsWith("hdfs:"))
+            .collect(Collectors.toList()).toArray(new String[] {});
       case TABLE:
         return getPreferredVolumesForTable(env, options);
       default:
@@ -135,11 +138,12 @@ public class PreferredVolumeChooser extends RandomVolumeChooser {
     }
     // preferred volumes should also exist in the original options (typically, from
     // instance.volumes)
-    Set<String> optionsList = Arrays.stream(options).collect(Collectors.toSet());
-    if (!preferred.stream().allMatch(optionsList::contains)) {
-      String msg = "Some volumes in " + preferred + " are not valid volumes from " + optionsList;
-      throw new VolumeChooserException(msg);
-    }
+    /*
+     * Set<String> optionsList = Arrays.stream(options).collect(Collectors.toSet()); if
+     * (!preferred.stream().allMatch(optionsList::contains)) { String msg = "Some volumes in " +
+     * preferred + " are not valid volumes from " + optionsList; throw new
+     * VolumeChooserException(msg); }
+     */
 
     return preferred.toArray(new String[preferred.size()]);
   }

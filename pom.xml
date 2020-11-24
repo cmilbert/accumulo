@@ -90,8 +90,8 @@
     <module>server/tracer</module>
     <module>server/tserver</module>
     <module>shell</module>
-    <!--<module>start</module>-->
-    <!--<module>test</module>-->
+    <module>start</module>
+    <module>test</module>
     <module>s3-support</module>
   </modules>
   <scm>
