@@ -119,38 +119,12 @@ public class DfsLogger implements Comparable<DfsLogger> {
     }
   }
 
-  public static class DFSLoggerInputStreams {
-
-    private FSDataInputStream originalInput;
-    private DataInputStream decryptingInputStream;
-
-    public DFSLoggerInputStreams(FSDataInputStream originalInput,
-        DataInputStream decryptingInputStream) {
-      this.originalInput = originalInput;
-      this.decryptingInputStream = decryptingInputStream;
-    }
-
-    public FSDataInputStream getOriginalInput() {
-      return originalInput;
-    }
-
-    public DataInputStream getDecryptingInputStream() {
-      return decryptingInputStream;
-    }
-  }
-
-  public interface ServerResources {
-    AccumuloConfiguration getConfiguration();
-
-    VolumeManager getFileSystem();
-  }
-
-  private final LinkedBlockingQueue<DfsLogger.LogWork> workQueue = new LinkedBlockingQueue<>();
+  private final LinkedBlockingQueue<LogWork> workQueue = new LinkedBlockingQueue<>();
 
   private final Object closeLock = new Object();
 
-  private static final DfsLogger.LogWork CLOSED_MARKER =
-      new DfsLogger.LogWork(null, Durability.FLUSH);
+  private static final LogWork CLOSED_MARKER =
+      new LogWork(null, Durability.FLUSH);
 
   private static final LogFileValue EMPTY = new LogFileValue();
 
@@ -161,7 +135,7 @@ public class DfsLogger implements Comparable<DfsLogger> {
 
     @Override
     public void run() {
-      ArrayList<DfsLogger.LogWork> work = new ArrayList<>();
+      ArrayList<LogWork> work = new ArrayList<>();
       boolean sawClosedMarker = false;
       while (!sawClosedMarker) {
         work.clear();
@@ -234,7 +208,7 @@ public class DfsLogger implements Comparable<DfsLogger> {
           }
         }
 
-        for (DfsLogger.LogWork logWork : work)
+        for (LogWork logWork : work)
           if (logWork == CLOSED_MARKER)
             sawClosedMarker = true;
           else
@@ -242,59 +216,11 @@ public class DfsLogger implements Comparable<DfsLogger> {
       }
     }
 
-    private void fail(ArrayList<DfsLogger.LogWork> work, Exception ex, String why) {
+    private void fail(ArrayList<LogWork> work, Exception ex, String why) {
       log.warn("Exception " + why + " " + ex);
-      for (DfsLogger.LogWork logWork : work) {
+      for (LogWork logWork : work) {
         logWork.exception = ex;
       }
-    }
-  }
-
-  private static class LogWork {
-    final CountDownLatch latch;
-    final Durability durability;
-    volatile Exception exception;
-
-    public LogWork(CountDownLatch latch, Durability durability) {
-      this.latch = latch;
-      this.durability = durability;
-    }
-  }
-
-  static class LoggerOperation {
-    private final LogWork work;
-
-    public LoggerOperation(LogWork work) {
-      this.work = work;
-    }
-
-    public void await() throws IOException {
-      try {
-        work.latch.await();
-      } catch (InterruptedException e) {
-        throw new RuntimeException(e);
-      }
-
-      if (work.exception != null) {
-        if (work.exception instanceof IOException)
-          throw (IOException) work.exception;
-        else if (work.exception instanceof RuntimeException)
-          throw (RuntimeException) work.exception;
-        else
-          throw new RuntimeException(work.exception);
-      }
-    }
-  }
-
-  private static class NoWaitLoggerOperation extends LoggerOperation {
-
-    public NoWaitLoggerOperation() {
-      super(null);
-    }
-
-    @Override
-    public void await() {
-      return;
     }
   }
 
@@ -584,7 +510,7 @@ public class DfsLogger implements Comparable<DfsLogger> {
 
   private LoggerOperation logFileData(List<Pair<LogFileKey,LogFileValue>> keys,
       Durability durability) throws IOException {
-    DfsLogger.LogWork work = new DfsLogger.LogWork(new CountDownLatch(1), durability);
+    LogWork work = new LogWork(new CountDownLatch(1), durability);
     try {
       for (Pair<LogFileKey,LogFileValue> pair : keys) {
         write(pair.getFirst(), pair.getSecond());

@@ -224,10 +224,7 @@ import org.apache.accumulo.tserver.TabletServerResourceManager.TabletResourceMan
 import org.apache.accumulo.tserver.TabletStatsKeeper.Operation;
 import org.apache.accumulo.tserver.compaction.MajorCompactionReason;
 import org.apache.accumulo.tserver.data.ServerConditionalMutation;
-import org.apache.accumulo.tserver.log.DfsLogger;
-import org.apache.accumulo.tserver.log.LogSorter;
-import org.apache.accumulo.tserver.log.MutationReceiver;
-import org.apache.accumulo.tserver.log.TabletServerLogger;
+import org.apache.accumulo.tserver.log.*;
 import org.apache.accumulo.tserver.mastermessage.MasterMessage;
 import org.apache.accumulo.tserver.mastermessage.SplitReportMessage;
 import org.apache.accumulo.tserver.mastermessage.TabletStatusMessage;
@@ -3340,8 +3337,8 @@ public class TabletServer extends AbstractServer {
     return confFactory.getTableConfiguration(extent.getTableId());
   }
 
-  public DfsLogger.ServerResources getServerConfig() {
-    return new DfsLogger.ServerResources() {
+  public ServerResources getServerConfig() {
+    return new ServerResources() {
 
       @Override
       public VolumeManager getFileSystem() {
