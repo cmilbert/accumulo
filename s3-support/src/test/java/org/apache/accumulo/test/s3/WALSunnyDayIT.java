@@ -40,6 +40,8 @@ import java.util.Map.Entry;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
+import com.google.common.collect.Iterators;
+
 import org.apache.accumulo.core.client.Accumulo;
 import org.apache.accumulo.core.client.AccumuloClient;
 import org.apache.accumulo.core.client.BatchWriter;
@@ -67,9 +69,9 @@ import org.apache.hadoop.fs.RawLocalFileSystem;
 import org.apache.hadoop.io.Text;
 import org.apache.zookeeper.KeeperException.NoNodeException;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
-import com.google.common.collect.Iterators;
-
+@Category(S3SupportTests.class)
 public class WALSunnyDayIT extends ConfigurableMacBase {
 
   private static final Text CF = new Text(new byte[0]);

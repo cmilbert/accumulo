@@ -32,6 +32,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import com.google.common.collect.ImmutableSet;
+
 import org.apache.accumulo.core.conf.ConfigurationCopy;
 import org.apache.accumulo.core.conf.Property;
 import org.apache.accumulo.core.crypto.CryptoServiceFactory;
@@ -53,11 +55,10 @@ import org.easymock.EasyMock;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.rules.TemporaryFolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.collect.ImmutableSet;
 
 /**
  * Integration Test for https://issues.apache.org/jira/browse/ACCUMULO-4148
@@ -80,6 +81,8 @@ import com.google.common.collect.ImmutableSet;
  * DefaultMap could move to a unit test in tserver, but they are here for convenience of viewing
  * both at the same time.
  */
+
+@Category(S3SupportTests.class)
 public class InMemoryMapIT {
 
   private static final Logger log = LoggerFactory.getLogger(InMemoryMapIT.class);

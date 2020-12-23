@@ -51,7 +51,9 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import com.amazon.morocco.mss.file.AccumuloMultiObjectS3FileSystem;
-import jline.console.ConsoleReader;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterators;
+
 import org.apache.accumulo.cluster.ClusterControl;
 import org.apache.accumulo.cluster.standalone.StandaloneAccumuloCluster;
 import org.apache.accumulo.core.Constants;
@@ -81,7 +83,6 @@ import org.apache.accumulo.fate.zookeeper.ZooUtil;
 import org.apache.accumulo.harness.AccumuloClusterHarness;
 import org.apache.accumulo.minicluster.ServerType;
 import org.apache.accumulo.miniclusterImpl.MiniAccumuloConfigImpl;
-import org.apache.accumulo.shell.Shell;
 import org.apache.accumulo.test.TestIngest;
 import org.apache.accumulo.test.TestIngest.IngestParams;
 import org.apache.accumulo.test.TestMultiTableIngest;
@@ -92,14 +93,13 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Iterators;
-
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
+@Category(S3SupportTests.class)
 public class ReadWriteTest extends AccumuloClusterHarness {
   String accumuloSuffix = "_" + System.currentTimeMillis();
 
@@ -113,8 +113,7 @@ public class ReadWriteTest extends AccumuloClusterHarness {
 
     hadoopCoreSite.set("fs.accS3nf.impl",
         "com.amazon.morocco.mss.file.AccumuloNoFlushS3FileSystem");
-    hadoopCoreSite.set("fs.accS3mo.impl",
-            AccumuloMultiObjectS3FileSystem.class.getName());
+    hadoopCoreSite.set("fs.accS3mo.impl", AccumuloMultiObjectS3FileSystem.class.getName());
 
     cfg.setProperty(Property.INSTANCE_ZK_TIMEOUT, "15s");
     this.cfg = cfg;
@@ -129,9 +128,11 @@ public class ReadWriteTest extends AccumuloClusterHarness {
     cfg.setProperty("general.volume.chooser",
         "org.apache.accumulo.server.fs.PreferredVolumeChooser");
     cfg.setProperty("general.custom.volume.preferred.default",
-        "accS3nf://racer-a-accumulo/accumulo" +  accumuloSuffix);
-    //cfg.setProperty("general.custom.volume.preferred.logger", "file:" + accumuloLocalDir.getPath());
-    cfg.setProperty("general.custom.volume.preferred.logger", "accS3mo://racer-a-accumulo/accumulo-wal" + accumuloSuffix);
+        "accS3nf://racer-a-accumulo/accumulo" + accumuloSuffix);
+    // cfg.setProperty("general.custom.volume.preferred.logger", "file:" +
+    // accumuloLocalDir.getPath());
+    cfg.setProperty("general.custom.volume.preferred.logger",
+        "accS3mo://racer-a-accumulo/accumulo-wal" + accumuloSuffix);
 
     // general.volume.chooser=org.apache.accumulo.server.fs.PreferredVolumeChooser
     // cfg.setProperty("general.volum.chooser",
