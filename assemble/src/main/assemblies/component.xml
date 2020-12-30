@@ -29,7 +29,8 @@
         pom.xml section which executes the maven-dependency-plugin to generate a
         version listing for packaged artifacts -->
         <include>${groupId}:${artifactId}-*</include>
-        <include>com.amazonaws:aws-java-sdk</include>
+        <include>com.amazonaws:aws-java-sdk-s3</include>
+        <include>com.amazonaws:aws-java-sdk-iam</include>
         <include>com.beust:jcommander</include>
         <include>com.fasterxml.jackson.core:jackson-annotations</include>
         <include>com.fasterxml.jackson.core:jackson-core</include>
