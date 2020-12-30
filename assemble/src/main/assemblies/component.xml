@@ -30,7 +30,7 @@
         version listing for packaged artifacts -->
         <include>${groupId}:${artifactId}-*</include>
         <include>com.amazonaws:aws-java-sdk-s3</include>
-        <include>com.amazonaws:aws-java-sdk-iam</include>
+        <include>com.amazonaws:aws-java-sdk-core</include>
         <include>com.beust:jcommander</include>
         <include>com.fasterxml.jackson.core:jackson-annotations</include>
         <include>com.fasterxml.jackson.core:jackson-core</include>
