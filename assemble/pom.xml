@@ -29,14 +29,14 @@
   <dependencies>
     <dependency>
       <groupId>com.amazonaws</groupId>
-      <artifactId>aws-java-sdk-core</artifactId>
+      <artifactId>aws-java-sdk-bundle</artifactId>
       <version>1.11.896</version>
     </dependency>
-    <dependency>
+    <!-- <dependency>
       <groupId>com.amazonaws</groupId>
       <artifactId>aws-java-sdk-s3</artifactId>
       <version>1.11.896</version>
-    </dependency>
+    </dependency> -->
     <dependency>
       <groupId>com.beust</groupId>
       <artifactId>jcommander</artifactId>
