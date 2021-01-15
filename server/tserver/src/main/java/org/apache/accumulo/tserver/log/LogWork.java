@@ -1,8 +1,8 @@
 package org.apache.accumulo.tserver.log;
 
-import org.apache.accumulo.core.client.Durability;
-
 import java.util.concurrent.CountDownLatch;
+
+import org.apache.accumulo.core.client.Durability;
 
 class LogWork {
   final CountDownLatch latch;

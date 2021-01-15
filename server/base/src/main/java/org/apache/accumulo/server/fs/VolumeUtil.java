@@ -16,6 +16,28 @@
  */
 package org.apache.accumulo.server.fs;
 
+import org.apache.accumulo.core.dataImpl.KeyExtent;
+import org.apache.accumulo.core.metadata.schema.DataFileValue;
+import org.apache.accumulo.core.protobuf.ProtobufUtil;
+import org.apache.accumulo.core.tabletserver.log.LogEntry;
+import org.apache.accumulo.core.util.Pair;
+import org.apache.accumulo.server.ServerConstants;
+import org.apache.accumulo.server.ServerContext;
+import org.apache.accumulo.server.fs.VolumeManager.FileType;
+import org.apache.accumulo.server.replication.StatusUtil;
+import org.apache.accumulo.server.replication.proto.Replication.Status;
+import org.apache.accumulo.server.util.MetadataTableUtil;
+import org.apache.accumulo.server.util.ReplicationTableUtil;
+import org.apache.accumulo.server.zookeeper.ServerLease;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.hadoop.fs.FSDataInputStream;
+import org.apache.hadoop.fs.FileStatus;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.FileUtil;
+import org.apache.hadoop.fs.Path;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.SecureRandom;
@@ -25,28 +47,6 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.SortedMap;
 import java.util.TreeMap;
-
-import org.apache.accumulo.core.dataImpl.KeyExtent;
-import org.apache.accumulo.core.metadata.schema.DataFileValue;
-import org.apache.accumulo.core.protobuf.ProtobufUtil;
-import org.apache.accumulo.core.tabletserver.log.LogEntry;
-import org.apache.accumulo.core.util.Pair;
-import org.apache.accumulo.fate.zookeeper.ZooLock;
-import org.apache.accumulo.server.ServerConstants;
-import org.apache.accumulo.server.ServerContext;
-import org.apache.accumulo.server.fs.VolumeManager.FileType;
-import org.apache.accumulo.server.replication.StatusUtil;
-import org.apache.accumulo.server.replication.proto.Replication.Status;
-import org.apache.accumulo.server.util.MetadataTableUtil;
-import org.apache.accumulo.server.util.ReplicationTableUtil;
-import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.hadoop.fs.FSDataInputStream;
-import org.apache.hadoop.fs.FileStatus;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.FileUtil;
-import org.apache.hadoop.fs.Path;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Utility methods for managing absolute URIs contained in Accumulo metadata.
@@ -174,7 +174,7 @@ public class VolumeUtil {
    * configured in instance.volumes.replacements. Second, if a tablet dir is no longer configured
    * for use it chooses a new tablet directory.
    */
-  public static TabletFiles updateTabletVolumes(ServerContext context, ZooLock zooLock,
+  public static TabletFiles updateTabletVolumes(ServerContext context, ServerLease zooLock,
       VolumeManager vm, KeyExtent extent, TabletFiles tabletFiles, boolean replicate)
       throws IOException {
     List<Pair<Path,Path>> replacements =
@@ -257,7 +257,7 @@ public class VolumeUtil {
     return ret;
   }
 
-  private static String decommisionedTabletDir(ServerContext context, ZooLock zooLock,
+  private static String decommisionedTabletDir(ServerContext context, ServerLease zooLock,
       VolumeManager vm, KeyExtent extent, String metaDir) throws IOException {
     Path dir = new Path(metaDir);
     if (isActiveVolume(context, dir))

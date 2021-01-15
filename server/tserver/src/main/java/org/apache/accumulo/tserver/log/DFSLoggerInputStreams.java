@@ -1,8 +1,8 @@
 package org.apache.accumulo.tserver.log;
 
-import org.apache.hadoop.fs.FSDataInputStream;
-
 import java.io.DataInputStream;
+
+import org.apache.hadoop.fs.FSDataInputStream;
 
 public class DFSLoggerInputStreams {
 
@@ -10,7 +10,7 @@ public class DFSLoggerInputStreams {
   private DataInputStream decryptingInputStream;
 
   public DFSLoggerInputStreams(FSDataInputStream originalInput,
-                               DataInputStream decryptingInputStream) {
+      DataInputStream decryptingInputStream) {
     this.originalInput = originalInput;
     this.decryptingInputStream = decryptingInputStream;
   }

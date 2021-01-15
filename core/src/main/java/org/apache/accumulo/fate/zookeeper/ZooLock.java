@@ -25,6 +25,7 @@ import java.util.List;
 import org.apache.accumulo.fate.zookeeper.ZooCache.ZcStat;
 import org.apache.accumulo.fate.zookeeper.ZooUtil.LockID;
 import org.apache.accumulo.fate.zookeeper.ZooUtil.NodeMissingPolicy;
+import org.apache.accumulo.server.zookeeper.ServerLease;
 import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
@@ -35,7 +36,7 @@ import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ZooLock implements Watcher {
+public class ZooLock implements Watcher, ServerLease {
   private static final Logger log = LoggerFactory.getLogger(ZooLock.class);
 
   public static final String LOCK_PREFIX = "zlock-";

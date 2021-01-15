@@ -76,7 +76,6 @@ import org.apache.accumulo.core.util.FastFormat;
 import org.apache.accumulo.core.util.Pair;
 import org.apache.accumulo.fate.FateTxId;
 import org.apache.accumulo.fate.zookeeper.IZooReaderWriter;
-import org.apache.accumulo.fate.zookeeper.ZooLock;
 import org.apache.accumulo.fate.zookeeper.ZooUtil.NodeExistsPolicy;
 import org.apache.accumulo.fate.zookeeper.ZooUtil.NodeMissingPolicy;
 import org.apache.accumulo.server.ServerConstants;
@@ -85,6 +84,7 @@ import org.apache.accumulo.server.fs.FileRef;
 import org.apache.accumulo.server.fs.VolumeChooserEnvironment;
 import org.apache.accumulo.server.fs.VolumeChooserEnvironmentImpl;
 import org.apache.accumulo.server.fs.VolumeManager;
+import org.apache.accumulo.server.zookeeper.ServerLease;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
@@ -127,7 +127,7 @@ public class MetadataTableUtil {
     return rootTable;
   }
 
-  public static void putLockID(ServerContext context, ZooLock zooLock, Mutation m) {
+  public static void putLockID(ServerContext context, ServerLease zooLock, Mutation m) {
     TabletsSection.ServerColumnFamily.LOCK_COLUMN.put(m,
         new Value(zooLock.getLockID().serialize(context.getZooKeeperRoot() + "/").getBytes(UTF_8)));
   }
@@ -136,12 +136,13 @@ public class MetadataTableUtil {
     update(context, null, m, extent);
   }
 
-  public static void update(ServerContext context, ZooLock zooLock, Mutation m, KeyExtent extent) {
+  public static void update(ServerContext context, ServerLease zooLock, Mutation m,
+      KeyExtent extent) {
     Writer t = extent.isMeta() ? getRootTable(context) : getMetadataTable(context);
     update(context, t, zooLock, m);
   }
 
-  public static void update(ServerContext context, Writer t, ZooLock zooLock, Mutation m) {
+  public static void update(ServerContext context, Writer t, ServerLease zooLock, Mutation m) {
     if (zooLock != null)
       putLockID(context, zooLock, m);
     while (true) {
@@ -160,7 +161,7 @@ public class MetadataTableUtil {
   }
 
   public static void updateTabletFlushID(KeyExtent extent, long flushID, ServerContext context,
-      ZooLock zooLock) {
+      ServerLease zooLock) {
     if (!extent.isRootTablet()) {
       Mutation m = new Mutation(extent.getMetadataEntry());
       TabletsSection.ServerColumnFamily.FLUSH_COLUMN.put(m,
@@ -170,7 +171,7 @@ public class MetadataTableUtil {
   }
 
   public static void updateTabletCompactID(KeyExtent extent, long compactID, ServerContext context,
-      ZooLock zooLock) {
+      ServerLease zooLock) {
     if (!extent.isRootTablet()) {
       Mutation m = new Mutation(extent.getMetadataEntry());
       TabletsSection.ServerColumnFamily.COMPACT_COLUMN.put(m,
@@ -180,7 +181,8 @@ public class MetadataTableUtil {
   }
 
   public static void updateTabletDataFile(long tid, KeyExtent extent,
-      Map<FileRef,DataFileValue> estSizes, String time, ServerContext context, ZooLock zooLock) {
+      Map<FileRef,DataFileValue> estSizes, String time, ServerContext context,
+      ServerLease zooLock) {
     Mutation m = new Mutation(extent.getMetadataEntry());
     Value tidValue = new Value(FateTxId.formatTid(tid));
 
@@ -194,14 +196,14 @@ public class MetadataTableUtil {
   }
 
   public static void updateTabletDir(KeyExtent extent, String newDir, ServerContext context,
-      ZooLock lock) {
+      ServerLease lock) {
     Mutation m = new Mutation(extent.getMetadataEntry());
     TabletsSection.ServerColumnFamily.DIRECTORY_COLUMN.put(m, new Value(newDir.getBytes(UTF_8)));
     update(context, lock, m, extent);
   }
 
   public static void addTablet(KeyExtent extent, String path, ServerContext context, char timeType,
-      ZooLock lock) {
+      ServerLease lock) {
     Mutation m = extent.getPrevRowUpdateMutation();
 
     TabletsSection.ServerColumnFamily.DIRECTORY_COLUMN.put(m, new Value(path.getBytes(UTF_8)));
@@ -213,7 +215,7 @@ public class MetadataTableUtil {
 
   public static void updateTabletVolumes(KeyExtent extent, List<LogEntry> logsToRemove,
       List<LogEntry> logsToAdd, List<FileRef> filesToRemove,
-      SortedMap<FileRef,DataFileValue> filesToAdd, String newDir, ZooLock zooLock,
+      SortedMap<FileRef,DataFileValue> filesToAdd, String newDir, ServerLease zooLock,
       ServerContext context) {
 
     if (extent.isRootTablet()) {
@@ -255,7 +257,7 @@ public class MetadataTableUtil {
     void run(IZooReaderWriter rw) throws KeeperException, InterruptedException, IOException;
   }
 
-  private static void retryZooKeeperUpdate(ServerContext context, ZooLock zooLock,
+  private static void retryZooKeeperUpdate(ServerContext context, ServerLease zooLock,
       ZooOperation op) {
     while (true) {
       try {
@@ -271,7 +273,7 @@ public class MetadataTableUtil {
     }
   }
 
-  private static void addRootLogEntry(ServerContext context, ZooLock zooLock,
+  private static void addRootLogEntry(ServerContext context, ServerLease zooLock,
       final LogEntry entry) {
     retryZooKeeperUpdate(context, zooLock, new ZooOperation() {
       @Override
@@ -309,7 +311,7 @@ public class MetadataTableUtil {
   }
 
   public static void rollBackSplit(Text metadataEntry, Text oldPrevEndRow, ServerContext context,
-      ZooLock zooLock) {
+      ServerLease zooLock) {
     KeyExtent ke = new KeyExtent(metadataEntry, oldPrevEndRow);
     Mutation m = ke.getPrevRowUpdateMutation();
     TabletsSection.TabletColumnFamily.SPLIT_RATIO_COLUMN.putDelete(m);
@@ -318,7 +320,7 @@ public class MetadataTableUtil {
   }
 
   public static void splitTablet(KeyExtent extent, Text oldPrevEndRow, double splitRatio,
-      ServerContext context, ZooLock zooLock) {
+      ServerContext context, ServerLease zooLock) {
     Mutation m = extent.getPrevRowUpdateMutation(); //
 
     TabletsSection.TabletColumnFamily.SPLIT_RATIO_COLUMN.put(m,
@@ -331,7 +333,7 @@ public class MetadataTableUtil {
   }
 
   public static void finishSplit(Text metadataEntry, Map<FileRef,DataFileValue> datafileSizes,
-      List<FileRef> highDatafilesToRemove, final ServerContext context, ZooLock zooLock) {
+      List<FileRef> highDatafilesToRemove, final ServerContext context, ServerLease zooLock) {
     Mutation m = new Mutation(metadataEntry);
     TabletsSection.TabletColumnFamily.SPLIT_RATIO_COLUMN.putDelete(m);
     TabletsSection.TabletColumnFamily.OLD_PREV_ROW_COLUMN.putDelete(m);
@@ -349,7 +351,7 @@ public class MetadataTableUtil {
   }
 
   public static void finishSplit(KeyExtent extent, Map<FileRef,DataFileValue> datafileSizes,
-      List<FileRef> highDatafilesToRemove, ServerContext context, ZooLock zooLock) {
+      List<FileRef> highDatafilesToRemove, ServerContext context, ServerLease zooLock) {
     finishSplit(extent.getMetadataEntry(), datafileSizes, highDatafilesToRemove, context, zooLock);
   }
 
@@ -380,7 +382,7 @@ public class MetadataTableUtil {
   }
 
   public static void removeScanFiles(KeyExtent extent, Set<FileRef> scanFiles,
-      ServerContext context, ZooLock zooLock) {
+      ServerContext context, ServerLease zooLock) {
     Mutation m = new Mutation(extent.getMetadataEntry());
 
     for (FileRef pathToRemove : scanFiles)
@@ -439,7 +441,7 @@ public class MetadataTableUtil {
   }
 
   public static void deleteTable(TableId tableId, boolean insertDeletes, ServerContext context,
-      ZooLock lock) throws AccumuloException {
+      ServerLease lock) throws AccumuloException {
     try (Scanner ms = new ScannerImpl(context, MetadataTable.ID, Authorizations.EMPTY);
         BatchWriter bw = new BatchWriterImpl(context, MetadataTable.ID,
             new BatchWriterConfig().setMaxMemory(1000000)
@@ -676,7 +678,7 @@ public class MetadataTableUtil {
   }
 
   public static void removeUnusedWALEntries(ServerContext context, KeyExtent extent,
-      final List<LogEntry> entries, ZooLock zooLock) {
+      final List<LogEntry> entries, ServerLease zooLock) {
     if (extent.isRootTablet()) {
       retryZooKeeperUpdate(context, zooLock, new ZooOperation() {
         @Override
@@ -921,7 +923,7 @@ public class MetadataTableUtil {
     }
   }
 
-  public static void chopped(ServerContext context, KeyExtent extent, ZooLock zooLock) {
+  public static void chopped(ServerContext context, KeyExtent extent, ServerLease zooLock) {
     Mutation m = new Mutation(extent.getMetadataEntry());
     ChoppedColumnFamily.CHOPPED_COLUMN.put(m, new Value("chopped".getBytes(UTF_8)));
     update(context, zooLock, m, extent);
