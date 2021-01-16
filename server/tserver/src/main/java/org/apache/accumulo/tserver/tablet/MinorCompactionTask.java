@@ -16,6 +16,8 @@
  */
 package org.apache.accumulo.tserver.tablet;
 
+import java.io.IOException;
+
 import org.apache.accumulo.core.metadata.schema.DataFileValue;
 import org.apache.accumulo.core.trace.TraceUtil;
 import org.apache.accumulo.server.fs.FileRef;
@@ -26,8 +28,6 @@ import org.apache.htrace.TraceScope;
 import org.apache.htrace.impl.ProbabilitySampler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
 
 class MinorCompactionTask implements Runnable {
 
