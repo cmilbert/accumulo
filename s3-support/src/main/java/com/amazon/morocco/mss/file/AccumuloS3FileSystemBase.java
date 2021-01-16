@@ -2,22 +2,6 @@ package com.amazon.morocco.mss.file;
 
 // import com.amazon.morocco.util.java.s3.MoroccoS3ClientBuilder;
 // import com.amazon.morocco.util.java.s3.MoroccoS3ClientBuilder;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FSDataOutputStream;
-import org.apache.hadoop.fs.FileStatus;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.fs.permission.FsPermission;
-import org.apache.hadoop.util.Progressable;
-
-// import com.amazon.morocco.util.java.s3.MoroccoS3ClientBuilder;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.AmazonServiceException.ErrorType;
 import com.amazonaws.ClientConfiguration;
@@ -42,9 +26,24 @@ import com.amazonaws.services.s3.model.PartListing;
 import com.amazonaws.services.s3.model.PartSummary;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.google.common.annotations.VisibleForTesting;
-
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FSDataOutputStream;
+import org.apache.hadoop.fs.FileStatus;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.permission.FsPermission;
+import org.apache.hadoop.util.Progressable;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+// import com.amazon.morocco.util.java.s3.MoroccoS3ClientBuilder;
 
 @Slf4j
 public abstract class AccumuloS3FileSystemBase extends FileSystem {
@@ -129,13 +128,17 @@ public abstract class AccumuloS3FileSystemBase extends FileSystem {
 
   @Override
   public boolean rename(Path oldName, Path newName) throws IOException {
-    try {
-      CopyObjectRequest copyRequest =
-          new CopyObjectRequest(this.bucketName, oldName.toUri().getPath().toString().substring(1),
-              this.bucketName, newName.toUri().getPath().toString().substring(1));
-      s3Client.copyObject(copyRequest);
-    } catch (Exception e) {
-      throw new IOException(e);
+    if (oldName.getName().endsWith("_tmp")) {
+      try {
+        CopyObjectRequest copyRequest =
+                new CopyObjectRequest(this.bucketName, oldName.toUri().getPath().substring(1),
+                        this.bucketName, newName.toUri().getPath().substring(1));
+        s3Client.copyObject(copyRequest);
+
+        s3Client.deleteObject(this.bucketName, oldName.toUri().getPath().substring(1));
+      } catch (Exception e) {
+        throw new IOException(e);
+      }
     }
     return true;
   }

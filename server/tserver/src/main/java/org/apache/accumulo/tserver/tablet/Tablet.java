@@ -16,35 +16,13 @@
  */
 package org.apache.accumulo.tserver.tablet;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.Objects.requireNonNull;
-import static org.apache.accumulo.fate.util.UtilWaitThread.sleepUninterruptibly;
-
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.PriorityQueue;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.concurrent.locks.ReentrantLock;
-
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Preconditions;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSet.Builder;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.accumulo.core.Constants;
 import org.apache.accumulo.core.client.Durability;
 import org.apache.accumulo.core.client.IteratorSetting;
@@ -152,14 +130,34 @@ import org.apache.zookeeper.KeeperException.NoNodeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Preconditions;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ImmutableSet.Builder;
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.PriorityQueue;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.ReentrantLock;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Objects.requireNonNull;
+import static org.apache.accumulo.fate.util.UtilWaitThread.sleepUninterruptibly;
 
 /**
  * Provide access to a single row range in a living TabletServer.
@@ -1879,7 +1877,7 @@ public class Tablet {
         // very important that we call this before doing major compaction,
         // otherwise deleted compacted files could possible be brought back
         // at some point if the file they were compacted to was legitimately
-        // removed by a major compaction
+        // removed by a major compactionS
         RootFiles.cleanupReplacement(fs, fs.listStatus(this.location), false);
       }
       SortedMap<FileRef,DataFileValue> allFiles = getDatafileManager().getDatafileSizes();
@@ -1990,7 +1988,12 @@ public class Tablet {
 
         FileRef fileName =
             getNextMapFilename((filesToCompact.size() == 0 && !propogateDeletes) ? "A" : "C");
-        FileRef compactTmpName = new FileRef(fileName.path() + "_tmp");
+        FileRef compactTmpName;
+        if (this.getExtent().isRootTablet()) {
+          compactTmpName = new FileRef(fileName.path() + "_tmp");
+        } else {
+          compactTmpName = new FileRef(fileName.path().toString());
+        }
 
         AccumuloConfiguration tableConf = createTableConfiguration(tableConfiguration, plan);
 
