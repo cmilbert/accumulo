@@ -25,7 +25,6 @@ import java.util.List;
 import org.apache.accumulo.fate.zookeeper.ZooCache.ZcStat;
 import org.apache.accumulo.fate.zookeeper.ZooUtil.LockID;
 import org.apache.accumulo.fate.zookeeper.ZooUtil.NodeMissingPolicy;
-import org.apache.accumulo.server.zookeeper.ServerLease;
 import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;

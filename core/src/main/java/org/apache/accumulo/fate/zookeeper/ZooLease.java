@@ -1,4 +1,4 @@
-package org.apache.accumulo.server.zookeeper;
+package org.apache.accumulo.fate.zookeeper;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.apache.accumulo.fate.zookeeper.ZooLock;
-import org.apache.accumulo.fate.zookeeper.ZooUtil;
 import org.apache.zookeeper.AsyncCallback;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.KeeperException;

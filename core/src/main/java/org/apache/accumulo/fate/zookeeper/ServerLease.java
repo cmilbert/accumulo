@@ -1,6 +1,5 @@
-package org.apache.accumulo.server.zookeeper;
+package org.apache.accumulo.fate.zookeeper;
 
-import org.apache.accumulo.fate.zookeeper.ZooUtil;
 import org.apache.zookeeper.KeeperException;
 
 public interface ServerLease {
