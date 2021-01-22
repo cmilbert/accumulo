@@ -155,6 +155,7 @@ public class MiniClusterHarness {
 
     // Invoke the callback for tests to configure MAC before it starts
     configCallback.configureMiniCluster(cfg, coreSite);
+    cfg.setHadoopConfiguration(coreSite);
 
     MiniAccumuloClusterImpl miniCluster = new MiniAccumuloClusterImpl(cfg);
 

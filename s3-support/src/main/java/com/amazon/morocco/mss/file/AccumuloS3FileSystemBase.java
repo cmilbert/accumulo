@@ -147,7 +147,7 @@ public abstract class AccumuloS3FileSystemBase extends FileSystem {
 
   @Override
   public FileStatus getFileStatus(Path path) throws IOException {
-    log.trace("getFileStatus for {}", path);
+    log.error("getFileStatus for {}", path);
     ObjectMetadata meta = s3.getObjectMetadata(bucketName, getObjectName(path));
     if (meta != null) {
       Date lastModifiedDate = meta.getLastModified();

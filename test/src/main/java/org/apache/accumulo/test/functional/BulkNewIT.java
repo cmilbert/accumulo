@@ -87,6 +87,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  */
 public class BulkNewIT extends SharedMiniClusterBase {
 
+  public static String accumuloSuffix = "_" + System.currentTimeMillis();
+
   @BeforeClass
   public static void setup() throws Exception {
     SharedMiniClusterBase.startMiniClusterWithConfig(new Callback());
@@ -104,6 +106,22 @@ public class BulkNewIT extends SharedMiniClusterBase {
 
       // use raw local file system
       conf.set("fs.file.impl", RawLocalFileSystem.class.getName());
+
+      conf.set("fs.accS3nf.impl",
+          com.amazon.morocco.mss.file.AccumuloNoFlushS3FileSystem.class.getName());
+      conf.set("fs.accS3mo.impl",
+          com.amazon.morocco.mss.file.AccumuloMultiObjectS3FileSystem.class.getName());
+
+      String vols = "file:" + cfg.getAccumuloDir() + ",accS3nf://racer-a-accumulo/accumulo" + accumuloSuffix;
+      // BILL testing with just s3
+      vols = "accS3nf://racer-a-accumulo/accumulo" + accumuloSuffix;
+      cfg.setProperty("instance.volumes", vols);
+      cfg.setProperty("general.volume.chooser",
+          "org.apache.accumulo.server.fs.PreferredVolumeChooser");
+      cfg.setProperty("general.custom.volume.preferred.default",
+          "accS3nf://racer-a-accumulo/accumulo" + accumuloSuffix);
+      cfg.setProperty("general.custom.volume.preferred.logger",
+          "accS3mo://racer-a-accumulo/accumulo-wal" + accumuloSuffix);
     }
   }
 
@@ -122,9 +140,14 @@ public class BulkNewIT extends SharedMiniClusterBase {
     try (AccumuloClient c = Accumulo.newClient().from(getClientProps()).build()) {
       tableName = getUniqueNames(1)[0];
       c.tableOperations().create(tableName);
-      aconf = getCluster().getServerContext().getConfiguration();
-      fs = getCluster().getFileSystem();
-      rootPath = getCluster().getTemporaryPath().toString();
+      aconf = getCluster()
+      .getServerContext()
+      .getConfiguration();
+      fs = getCluster()
+      .getFileSystem();
+      rootPath = getCluster()
+      .getTemporaryPath()
+      .toString();
     }
   }
 
