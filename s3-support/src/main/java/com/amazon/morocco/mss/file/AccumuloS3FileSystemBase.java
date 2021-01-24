@@ -130,7 +130,7 @@ public abstract class AccumuloS3FileSystemBase extends FileSystem {
 
   @Override
   public boolean rename(Path oldName, Path newName) throws IOException {
-    if (oldName.getName().endsWith("_tmp")) {
+    if (!oldName.equals(newName)) {
       try {
         CopyObjectRequest copyRequest =
             new CopyObjectRequest(this.bucketName, oldName.toUri().getPath().substring(1),
