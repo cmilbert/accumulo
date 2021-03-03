@@ -1,4 +1,4 @@
-package com.amazon.morocco.mss.file;
+package org.apache.accumulo.s3.file;
 
 import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;

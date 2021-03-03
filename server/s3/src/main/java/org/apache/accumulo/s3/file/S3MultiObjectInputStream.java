@@ -1,4 +1,4 @@
-package com.amazon.morocco.mss.file;
+package org.apache.accumulo.s3.file;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

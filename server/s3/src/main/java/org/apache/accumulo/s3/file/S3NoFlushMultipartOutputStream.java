@@ -1,4 +1,4 @@
-package com.amazon.morocco.mss.file;
+package org.apache.accumulo.s3.file;
 
 public class S3NoFlushMultipartOutputStream extends S3OutputStreamBase {
 

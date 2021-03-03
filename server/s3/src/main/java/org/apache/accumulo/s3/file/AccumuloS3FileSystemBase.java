@@ -1,4 +1,4 @@
-package com.amazon.morocco.mss.file;
+package org.apache.accumulo.s3.file;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -15,8 +15,6 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.util.Progressable;
 
-// import com.amazon.morocco.util.java.s3.MoroccoS3ClientBuilder;
-// import com.amazon.morocco.util.java.s3.MoroccoS3ClientBuilder;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.AmazonServiceException.ErrorType;
 import com.amazonaws.ClientConfiguration;
@@ -45,8 +43,6 @@ import com.google.common.annotations.VisibleForTesting;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.extern.slf4j.Slf4j;
 
-// import com.amazon.morocco.util.java.s3.MoroccoS3ClientBuilder;
-
 @Slf4j
 public abstract class AccumuloS3FileSystemBase extends FileSystem {
 
@@ -55,7 +51,7 @@ public abstract class AccumuloS3FileSystemBase extends FileSystem {
   private static final int S3_SOCKET_TIMEOUT_MS = 30000;
   private static final int S3_CLIENT_EXECUTION_TIMEOUT_MS = 30000;
   protected static final String DIR_MARKER = "__$DIR$";
-  public static final String USE_STATIC_CLIENT = "com.amazon.morocco.mss.file.useStaticClient";
+  public static final String USE_STATIC_CLIENT = "org.apache.accumulo.s3.file.useStaticClient";
 
   @VisibleForTesting
   @SuppressFBWarnings("MS_SHOULD_BE_FINAL")

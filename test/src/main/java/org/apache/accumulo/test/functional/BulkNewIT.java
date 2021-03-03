@@ -108,13 +108,14 @@ public class BulkNewIT extends SharedMiniClusterBase {
       conf.set("fs.file.impl", RawLocalFileSystem.class.getName());
 
       conf.set("fs.accS3nf.impl",
-          com.amazon.morocco.mss.file.AccumuloNoFlushS3FileSystem.class.getName());
+          org.apache.accumulo.s3.file.AccumuloNoFlushS3FileSystem.class.getName());
       conf.set("fs.accS3mo.impl",
-          com.amazon.morocco.mss.file.AccumuloMultiObjectS3FileSystem.class.getName());
+          org.apache.accumulo.s3.file.AccumuloMultiObjectS3FileSystem.class.getName());
 
-      String vols = "file://" + cfg.getDir() + "/accumulo,accS3nf://racer-a-accumulo/accumulo" + accumuloSuffix;
+      String vols = "file://" + cfg.getDir() + "/accumulo,accS3nf://racer-a-accumulo/accumulo"
+          + accumuloSuffix;
       // BILL testing with just s3
-      //vols = "accS3nf://racer-a-accumulo/accumulo" + accumuloSuffix;
+      // vols = "accS3nf://racer-a-accumulo/accumulo" + accumuloSuffix;
       cfg.setProperty("instance.volumes", vols);
       cfg.setProperty("general.volume.chooser",
           "org.apache.accumulo.server.fs.PreferredVolumeChooser");
@@ -140,14 +141,9 @@ public class BulkNewIT extends SharedMiniClusterBase {
     try (AccumuloClient c = Accumulo.newClient().from(getClientProps()).build()) {
       tableName = getUniqueNames(1)[0];
       c.tableOperations().create(tableName);
-      aconf = getCluster()
-      .getServerContext()
-      .getConfiguration();
-      fs = getCluster()
-      .getFileSystem();
-      rootPath = getCluster()
-      .getTemporaryPath()
-      .toString();
+      aconf = getCluster().getServerContext().getConfiguration();
+      fs = getCluster().getFileSystem();
+      rootPath = getCluster().getTemporaryPath().toString();
     }
   }
 

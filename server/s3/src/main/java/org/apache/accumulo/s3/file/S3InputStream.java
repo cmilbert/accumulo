@@ -1,4 +1,4 @@
-package com.amazon.morocco.mss.file;
+package org.apache.accumulo.s3.file;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,17 +29,17 @@ public class S3InputStream extends InputStream implements Seekable, PositionedRe
   private long position = 0;
   private final int minBufferSize;
   private final static int MIN_BUFFER_SIZE_DEFAULT = 1 << 18;
-  public final static String MIN_BUFFER_SIZE_KEY = "com.amazon.morocco.s3.read.buffer.min";
+  public final static String MIN_BUFFER_SIZE_KEY = "org.apache.accumulo.s3.read.buffer.min";
   private final int maxBufferSize;
   private final static int MAX_BUFFER_SIZE_DEFAULT = 1 << 24;
-  public final static String MAX_BUFFER_SIZE_KEY = "com.amazon.morocco.s3.read.buffer.max";
+  public final static String MAX_BUFFER_SIZE_KEY = "org.apache.accumulo.s3.read.buffer.max";
   private final Configuration conf;
 
   public static class ExtraBufferAllocationTracker {
 
     private final static long MAX_EXTRA_BUFFER_TO_ALLOCATE_DEFAULT = 1L << 30;
     public final static String MAX_EXTRA_BUFFER_TO_ALLOCATE_KEY =
-        "com.amazon.morocco.s3.read.buffer.allocation.limit";
+        "org.apache.accumulo.s3.read.buffer.allocation.limit";
 
     private static long totalExtraBufferAllocated = 0;
     private static long maxExtraBufferToAllocate = -1;
@@ -131,7 +131,6 @@ public class S3InputStream extends InputStream implements Seekable, PositionedRe
     long offsetStart =
         Math.max(0L, Math.min(start, Math.max(bufferEnd, objectLength - minBufferSize)));
     int length = (int) Math.min(objectLength - offsetStart, targetBufferSize);
-    // get minBufferSize allocated for free -- it will be tracked as part of MOROCCO-119
     int currentBufferAllocation = Math.max(minBufferSize, buffer == null ? 0 : buffer.length);
     if (length > currentBufferAllocation) {
       // try to allocate a larger buffer, but fall back on the current buffer size if we can't
