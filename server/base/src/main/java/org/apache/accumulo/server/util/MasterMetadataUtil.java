@@ -50,7 +50,7 @@ import org.apache.accumulo.core.security.Authorizations;
 import org.apache.accumulo.core.util.ColumnFQ;
 import org.apache.accumulo.fate.FateTxId;
 import org.apache.accumulo.fate.zookeeper.IZooReaderWriter;
-import org.apache.accumulo.fate.zookeeper.ZooLock;
+import org.apache.accumulo.fate.zookeeper.ServerLease;
 import org.apache.accumulo.fate.zookeeper.ZooUtil.NodeMissingPolicy;
 import org.apache.accumulo.server.ServerContext;
 import org.apache.accumulo.server.fs.FileRef;
@@ -67,7 +67,7 @@ public class MasterMetadataUtil {
   public static void addNewTablet(ServerContext context, KeyExtent extent, String path,
       TServerInstance location, Map<FileRef,DataFileValue> datafileSizes,
       Map<Long,? extends Collection<FileRef>> bulkLoadedFiles, String time, long lastFlushID,
-      long lastCompactID, ZooLock zooLock) {
+      long lastCompactID, ServerLease zooLock) {
     Mutation m = extent.getPrevRowUpdateMutation();
 
     TabletsSection.ServerColumnFamily.DIRECTORY_COLUMN.put(m, new Value(path.getBytes(UTF_8)));
@@ -99,7 +99,7 @@ public class MasterMetadataUtil {
   }
 
   public static KeyExtent fixSplit(ServerContext context, Text metadataEntry,
-      SortedMap<ColumnFQ,Value> columns, ZooLock lock) throws AccumuloException {
+      SortedMap<ColumnFQ,Value> columns, ServerLease lock) throws AccumuloException {
     log.info("Incomplete split {} attempting to fix", metadataEntry);
 
     Value oper = columns.get(TabletsSection.TabletColumnFamily.OLD_PREV_ROW_COLUMN);
@@ -134,7 +134,7 @@ public class MasterMetadataUtil {
   }
 
   private static KeyExtent fixSplit(ServerContext context, TableId tableId, Text metadataEntry,
-      Text metadataPrevEndRow, Value oper, double splitRatio, ZooLock lock)
+      Text metadataPrevEndRow, Value oper, double splitRatio, ServerLease lock)
       throws AccumuloException {
     if (metadataPrevEndRow == null)
       // something is wrong, this should not happen... if a tablet is split, it will always have a
@@ -187,7 +187,7 @@ public class MasterMetadataUtil {
     }
   }
 
-  private static TServerInstance getTServerInstance(String address, ZooLock zooLock) {
+  private static TServerInstance getTServerInstance(String address, ServerLease zooLock) {
     while (true) {
       try {
         return new TServerInstance(address, zooLock.getSessionId());
@@ -200,14 +200,14 @@ public class MasterMetadataUtil {
 
   public static void replaceDatafiles(ServerContext context, KeyExtent extent,
       Set<FileRef> datafilesToDelete, Set<FileRef> scanFiles, FileRef path, Long compactionId,
-      DataFileValue size, String address, TServerInstance lastLocation, ZooLock zooLock) {
+      DataFileValue size, String address, TServerInstance lastLocation, ServerLease zooLock) {
     replaceDatafiles(context, extent, datafilesToDelete, scanFiles, path, compactionId, size,
         address, lastLocation, zooLock, true);
   }
 
   public static void replaceDatafiles(ServerContext context, KeyExtent extent,
       Set<FileRef> datafilesToDelete, Set<FileRef> scanFiles, FileRef path, Long compactionId,
-      DataFileValue size, String address, TServerInstance lastLocation, ZooLock zooLock,
+      DataFileValue size, String address, TServerInstance lastLocation, ServerLease zooLock,
       boolean insertDeleteFlags) {
 
     if (insertDeleteFlags) {
@@ -250,7 +250,7 @@ public class MasterMetadataUtil {
    */
   public static void updateTabletDataFile(ServerContext context, KeyExtent extent, FileRef path,
       FileRef mergeFile, DataFileValue dfv, String time, Set<FileRef> filesInUseByScans,
-      String address, ZooLock zooLock, Set<String> unusedWalLogs, TServerInstance lastLocation,
+      String address, ServerLease zooLock, Set<String> unusedWalLogs, TServerInstance lastLocation,
       long flushId) {
     if (extent.isRootTablet()) {
       if (unusedWalLogs != null) {
@@ -294,7 +294,7 @@ public class MasterMetadataUtil {
    */
   private static Mutation getUpdateForTabletDataFile(KeyExtent extent, FileRef path,
       FileRef mergeFile, DataFileValue dfv, String time, Set<FileRef> filesInUseByScans,
-      String address, ZooLock zooLock, Set<String> unusedWalLogs, TServerInstance lastLocation,
+      String address, ServerLease zooLock, Set<String> unusedWalLogs, TServerInstance lastLocation,
       long flushId) {
     Mutation m = new Mutation(extent.getMetadataEntry());
 

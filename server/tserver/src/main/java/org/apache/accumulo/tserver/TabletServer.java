@@ -164,7 +164,9 @@ import org.apache.accumulo.core.util.ratelimit.SharedRateLimiterFactory.RateProv
 import org.apache.accumulo.fate.util.LoggingRunnable;
 import org.apache.accumulo.fate.util.Retry;
 import org.apache.accumulo.fate.util.Retry.RetryFactory;
+import org.apache.accumulo.fate.zookeeper.ServerLease;
 import org.apache.accumulo.fate.zookeeper.ZooCache;
+import org.apache.accumulo.fate.zookeeper.ZooLease;
 import org.apache.accumulo.fate.zookeeper.ZooLock;
 import org.apache.accumulo.fate.zookeeper.ZooLock.LockLossReason;
 import org.apache.accumulo.fate.zookeeper.ZooLock.LockWatcher;
@@ -224,7 +226,11 @@ import org.apache.accumulo.tserver.TabletServerResourceManager.TabletResourceMan
 import org.apache.accumulo.tserver.TabletStatsKeeper.Operation;
 import org.apache.accumulo.tserver.compaction.MajorCompactionReason;
 import org.apache.accumulo.tserver.data.ServerConditionalMutation;
-import org.apache.accumulo.tserver.log.*;
+import org.apache.accumulo.tserver.log.DfsLogger;
+import org.apache.accumulo.tserver.log.LogSorter;
+import org.apache.accumulo.tserver.log.MutationReceiver;
+import org.apache.accumulo.tserver.log.ServerResources;
+import org.apache.accumulo.tserver.log.TabletServerLogger;
 import org.apache.accumulo.tserver.mastermessage.MasterMessage;
 import org.apache.accumulo.tserver.mastermessage.SplitReportMessage;
 import org.apache.accumulo.tserver.mastermessage.TabletStatusMessage;
@@ -330,7 +336,7 @@ public class TabletServer extends AbstractServer {
   private volatile boolean serverStopRequested = false;
   private volatile boolean shutdownComplete = false;
 
-  private ZooLock tabletServerLock;
+  private ZooLease tabletServerLock;
 
   private TServer server;
   private volatile TServer replServer;
@@ -2367,10 +2373,6 @@ public class TabletServer extends AbstractServer {
         }
       } catch (DistributedStoreException ex) {
         log.warn("Unable to update storage", ex);
-      } catch (KeeperException e) {
-        log.warn("Unable determine our zookeeper session information", e);
-      } catch (InterruptedException e) {
-        log.warn("Interrupted while getting our zookeeper session information", e);
       }
 
       // tell the master how it went
@@ -2682,7 +2684,7 @@ public class TabletServer extends AbstractServer {
     }
   }
 
-  public ZooLock getLock() {
+  public ZooLease getLock() {
     return tabletServerLock;
   }
 
@@ -2702,7 +2704,7 @@ public class TabletServer extends AbstractServer {
         throw e;
       }
 
-      tabletServerLock = new ZooLock(zoo, zPath);
+      // tabletServerLock = new ZooLock(zoo, zPath);
 
       LockWatcher lw = new LockWatcher() {
 
@@ -2722,16 +2724,21 @@ public class TabletServer extends AbstractServer {
 
         }
       };
+      //
+      // byte[] lockContent = new ServerServices(getClientAddressString(), Service.TSERV_CLIENT)
+      // .toString().getBytes(UTF_8);
 
       byte[] lockContent = new ServerServices(getClientAddressString(), Service.TSERV_CLIENT)
           .toString().getBytes(UTF_8);
+      tabletServerLock =
+          ZooLease.requestLease(zoo.getZooKeeper(), zPath, lockContent, ZooUtil.PUBLIC, lw);
       for (int i = 0; i < 120 / 5; i++) {
         zoo.putPersistentData(zPath, new byte[0], NodeExistsPolicy.SKIP);
 
-        if (tabletServerLock.tryLock(lw, lockContent)) {
-          log.debug("Obtained tablet server lock {}", tabletServerLock.getLockPath());
+        if (tabletServerLock.isLeaseHeld()) {
           lockID = tabletServerLock.getLockID()
-              .serialize(getContext().getZooKeeperRoot() + Constants.ZTSERVERS + "/");
+              .serialize(ZooUtil.getRoot(getContext().getInstanceID()) + Constants.ZTSERVERS + "/");
+          log.debug("Obtained tablet server lock " + lockID);
           return;
         }
         log.info("Waiting for tablet server lock");
@@ -2982,7 +2989,7 @@ public class TabletServer extends AbstractServer {
 
   public static Pair<Text,KeyExtent> verifyTabletInformation(ServerContext context,
       KeyExtent extent, TServerInstance instance, final SortedMap<Key,Value> tabletsKeyValues,
-      String clientAddress, ZooLock lock) throws DistributedStoreException, AccumuloException {
+      String clientAddress, ServerLease lock) throws DistributedStoreException, AccumuloException {
     Objects.requireNonNull(tabletsKeyValues);
 
     log.debug("verifying extent {}", extent);

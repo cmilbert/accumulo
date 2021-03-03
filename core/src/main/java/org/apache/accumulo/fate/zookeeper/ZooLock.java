@@ -35,7 +35,7 @@ import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ZooLock implements Watcher {
+public class ZooLock implements Watcher, ServerLease {
   private static final Logger log = LoggerFactory.getLogger(ZooLock.class);
 
   public static final String LOCK_PREFIX = "zlock-";

@@ -1879,7 +1879,7 @@ public class Tablet {
         // very important that we call this before doing major compaction,
         // otherwise deleted compacted files could possible be brought back
         // at some point if the file they were compacted to was legitimately
-        // removed by a major compaction
+        // removed by a major compactionS
         RootFiles.cleanupReplacement(fs, fs.listStatus(this.location), false);
       }
       SortedMap<FileRef,DataFileValue> allFiles = getDatafileManager().getDatafileSizes();
@@ -1990,7 +1990,12 @@ public class Tablet {
 
         FileRef fileName =
             getNextMapFilename((filesToCompact.size() == 0 && !propogateDeletes) ? "A" : "C");
-        FileRef compactTmpName = new FileRef(fileName.path() + "_tmp");
+        FileRef compactTmpName;
+        if (this.getExtent().isRootTablet()) {
+          compactTmpName = new FileRef(fileName.path() + "_tmp");
+        } else {
+          compactTmpName = new FileRef(fileName.path().toString());
+        }
 
         AccumuloConfiguration tableConf = createTableConfiguration(tableConfiguration, plan);
 

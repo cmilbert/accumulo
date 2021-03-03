@@ -363,9 +363,6 @@ public class Initialize implements KeywordExecutable {
         fs.choose(chooserEnv, configuredVolumes) + Path.SEPARATOR + ServerConstants.TABLE_DIR
             + Path.SEPARATOR + RootTable.ID + RootTable.ROOT_TABLET_LOCATION).toString();
 
-    System.out.println("####### Root Table Dir: " + rootTabletDir);
-    log.error("Using root tablet dir {}", rootTabletDir);
-
     try {
       initZooKeeper(opts, uuid.toString(), instanceNamePath, rootTabletDir);
     } catch (Exception e) {
@@ -530,8 +527,6 @@ public class Initialize implements KeywordExecutable {
         new Tablet(MetadataTable.ID, tableMetadataTabletDir, null, splitPoint, metadataFileName);
     Tablet defaultTablet = new Tablet(MetadataTable.ID, defaultMetadataTabletDir, splitPoint, null);
     createMetadataFile(fs, rootTabletFileName, siteConfig, tablesTablet, defaultTablet);
-
-    addVolumes(fs, siteConfig, hadoopConf);
   }
 
   private static class Tablet {

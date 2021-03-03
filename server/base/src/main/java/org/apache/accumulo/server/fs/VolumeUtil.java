@@ -31,7 +31,7 @@ import org.apache.accumulo.core.metadata.schema.DataFileValue;
 import org.apache.accumulo.core.protobuf.ProtobufUtil;
 import org.apache.accumulo.core.tabletserver.log.LogEntry;
 import org.apache.accumulo.core.util.Pair;
-import org.apache.accumulo.fate.zookeeper.ZooLock;
+import org.apache.accumulo.fate.zookeeper.ServerLease;
 import org.apache.accumulo.server.ServerConstants;
 import org.apache.accumulo.server.ServerContext;
 import org.apache.accumulo.server.fs.VolumeManager.FileType;
@@ -174,7 +174,7 @@ public class VolumeUtil {
    * configured in instance.volumes.replacements. Second, if a tablet dir is no longer configured
    * for use it chooses a new tablet directory.
    */
-  public static TabletFiles updateTabletVolumes(ServerContext context, ZooLock zooLock,
+  public static TabletFiles updateTabletVolumes(ServerContext context, ServerLease zooLock,
       VolumeManager vm, KeyExtent extent, TabletFiles tabletFiles, boolean replicate)
       throws IOException {
     List<Pair<Path,Path>> replacements =
@@ -257,7 +257,7 @@ public class VolumeUtil {
     return ret;
   }
 
-  private static String decommisionedTabletDir(ServerContext context, ZooLock zooLock,
+  private static String decommisionedTabletDir(ServerContext context, ServerLease zooLock,
       VolumeManager vm, KeyExtent extent, String metaDir) throws IOException {
     Path dir = new Path(metaDir);
     if (isActiveVolume(context, dir))

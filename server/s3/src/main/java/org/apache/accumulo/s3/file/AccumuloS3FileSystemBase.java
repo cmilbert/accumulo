@@ -126,13 +126,17 @@ public abstract class AccumuloS3FileSystemBase extends FileSystem {
 
   @Override
   public boolean rename(Path oldName, Path newName) throws IOException {
-    try {
-      CopyObjectRequest copyRequest =
-          new CopyObjectRequest(this.bucketName, oldName.toUri().getPath().toString().substring(1),
-              this.bucketName, newName.toUri().getPath().toString().substring(1));
-      s3Client.copyObject(copyRequest);
-    } catch (Exception e) {
-      throw new IOException(e);
+    if (oldName.getName().endsWith("_tmp")) {
+      try {
+        CopyObjectRequest copyRequest =
+            new CopyObjectRequest(this.bucketName, oldName.toUri().getPath().substring(1),
+                this.bucketName, newName.toUri().getPath().substring(1));
+        s3Client.copyObject(copyRequest);
+
+        s3Client.deleteObject(this.bucketName, oldName.toUri().getPath().substring(1));
+      } catch (Exception e) {
+        throw new IOException(e);
+      }
     }
     return true;
   }

@@ -1,8 +1,8 @@
 package org.apache.accumulo.tserver.log;
 
-import org.apache.hadoop.fs.FSDataInputStream;
-
 import java.io.DataInputStream;
+
+import org.apache.hadoop.fs.FSDataInputStream;
 
 public class DFSLoggerInputStreams {
 
