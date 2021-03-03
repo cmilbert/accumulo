@@ -123,8 +123,7 @@ public class DfsLogger implements Comparable<DfsLogger> {
 
   private final Object closeLock = new Object();
 
-  private static final LogWork CLOSED_MARKER =
-      new LogWork(null, Durability.FLUSH);
+  private static final LogWork CLOSED_MARKER = new LogWork(null, Durability.FLUSH);
 
   private static final LogFileValue EMPTY = new LogFileValue();
 

@@ -64,7 +64,7 @@ public class PreferredVolumeChooser extends RandomVolumeChooser {
             ChooserScope.INIT);
         log.error("Received options: {}", Arrays.toString(options));
         return Arrays.stream(options)
-            .filter(opt -> true /*opt.startsWith("file:") || opt.startsWith("hdfs:")*/)
+            .filter(opt -> true /* opt.startsWith("file:") || opt.startsWith("hdfs:") */)
             .collect(Collectors.toList()).toArray(new String[] {});
       case TABLE:
         return getPreferredVolumesForTable(env, options);

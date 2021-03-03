@@ -65,7 +65,8 @@ public class HadoopLogCloser implements LogCloser {
         ns.append(source).close();
         log.info("Recovered lease on {} using append", source);
       }
-    } else if (ns instanceof LocalFileSystem || ns instanceof RawLocalFileSystem || ns.getScheme().toLowerCase().contains("s3")) {
+    } else if (ns instanceof LocalFileSystem || ns instanceof RawLocalFileSystem
+        || ns.getScheme().toLowerCase().contains("s3")) {
       // TODO port over the LogCloser impls for S3
       // ignore
     } else {

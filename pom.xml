@@ -89,10 +89,10 @@
     <module>server/native</module>
     <module>server/tracer</module>
     <module>server/tserver</module>
+    <module>server/s3</module>
     <module>shell</module>
     <module>start</module>
     <module>test</module>
-    <module>s3-support</module>
   </modules>
   <scm>
     <connection>scm:git:https://gitbox.apache.org/repos/asf/accumulo.git</connection>
@@ -390,7 +390,7 @@
       </dependency>
       <dependency>
         <groupId>org.apache.accumulo</groupId>
-        <artifactId>s3-support</artifactId>
+        <artifactId>s3</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>

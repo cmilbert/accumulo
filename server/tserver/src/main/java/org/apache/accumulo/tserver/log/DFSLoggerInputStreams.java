@@ -10,7 +10,7 @@ public class DFSLoggerInputStreams {
   private DataInputStream decryptingInputStream;
 
   public DFSLoggerInputStreams(FSDataInputStream originalInput,
-                               DataInputStream decryptingInputStream) {
+      DataInputStream decryptingInputStream) {
     this.originalInput = originalInput;
     this.decryptingInputStream = decryptingInputStream;
   }
