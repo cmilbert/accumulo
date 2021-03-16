@@ -8,6 +8,7 @@
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <artifactId>accumulo-s3</artifactId>
+  <name>Apache Accumulo S3</name>
   <dependencyManagement>
     <dependencies>
       <dependency>

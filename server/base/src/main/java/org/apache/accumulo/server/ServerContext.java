@@ -59,7 +59,7 @@ public class ServerContext extends ClientContext {
   public ServerContext(SiteConfiguration siteConfig) {
     this(new ServerInfo(siteConfig));
   }
-  
+
   public ServerContext(SiteConfiguration siteConfig, Configuration hadoopConf) {
     this(new ServerInfo(siteConfig, hadoopConf));
   }
