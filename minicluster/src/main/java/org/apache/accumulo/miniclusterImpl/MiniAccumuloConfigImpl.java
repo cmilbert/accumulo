@@ -110,7 +110,6 @@ public class MiniAccumuloConfigImpl {
     this.hadoopConf = userConf;
   }
 
-
   /**
    * Set directories and fully populate site config
    */

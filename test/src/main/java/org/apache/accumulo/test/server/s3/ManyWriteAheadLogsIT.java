@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.accumulo.s3.file;
+package org.apache.accumulo.test.server.s3;
 
 import static org.junit.Assert.assertTrue;
 

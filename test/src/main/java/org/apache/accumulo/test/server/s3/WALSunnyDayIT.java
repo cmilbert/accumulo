@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.accumulo.s3.file;
+package org.apache.accumulo.test.server.s3;
 
 import static org.apache.accumulo.core.conf.Property.GC_CYCLE_DELAY;
 import static org.apache.accumulo.core.conf.Property.GC_CYCLE_START;
