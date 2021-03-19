@@ -84,19 +84,18 @@ public class ReadWriteTest extends AccumuloClusterHarness {
     this.hadoopCoreSite = hadoopCoreSite;
     File accumuloLocalDir = new File(cfg.getDir(), "accumulo" + accumuloSuffix);
 
-    String vols = "file:" + accumuloLocalDir.getPath() + ",accS3nf://racer-a-accumulo/accumulo"
+    String vols = "file:" + accumuloLocalDir.getPath() + ",accS3nf://test-bucket/accumulo"
         + accumuloSuffix;
-    // BILL testing with just s3
-    vols = "accS3nf://racer-a-accumulo/accumulo" + accumuloSuffix;
+    vols = "accS3nf://test-bucket/accumulo" + accumuloSuffix;
     cfg.setProperty("instance.volumes", vols);
     cfg.setProperty("general.volume.chooser",
         "org.apache.accumulo.server.fs.PreferredVolumeChooser");
     cfg.setProperty("general.custom.volume.preferred.default",
-        "accS3nf://racer-a-accumulo/accumulo" + accumuloSuffix);
+        "accS3nf://test-bucket/accumulo" + accumuloSuffix);
     // cfg.setProperty("general.custom.volume.preferred.logger", "file:" +
     // accumuloLocalDir.getPath());
     cfg.setProperty("general.custom.volume.preferred.logger",
-        "accS3mo://racer-a-accumulo/accumulo-wal" + accumuloSuffix);
+        "accS3mo://test-bucket/accumulo-wal" + accumuloSuffix);
 
     // general.volume.chooser=org.apache.accumulo.server.fs.PreferredVolumeChooser
     // cfg.setProperty("general.volum.chooser",
@@ -146,7 +145,7 @@ public class ReadWriteTest extends AccumuloClusterHarness {
       String tableName = getUniqueNames(1)[0];
       NewTableConfiguration ntc = new NewTableConfiguration();
       ntc.setProperties(ImmutableMap.of("table.custom.volume.preferred",
-          "accS3nf://racer-a-accumulo/accumulo" + accumuloSuffix));
+          "accS3nf://test-bucket/accumulo" + accumuloSuffix));
       accumuloClient.tableOperations().create("s3_table", ntc);
       ingest(accumuloClient, getClientInfo(), ROWS, COLS, 50, 0, "s3_table");
       verify(accumuloClient, getClientInfo(), ROWS, COLS, 50, 0, "s3_table");

@@ -112,17 +112,15 @@ public class BulkNewIT extends SharedMiniClusterBase {
       conf.set("fs.accS3mo.impl",
           org.apache.accumulo.s3.file.AccumuloMultiObjectS3FileSystem.class.getName());
 
-      String vols = "file://" + cfg.getDir() + "/accumulo,accS3nf://racer-a-accumulo/accumulo"
+      String vols = "file://" + cfg.getDir() + "/accumulo,accS3nf://test-bucket/accumulo"
           + accumuloSuffix;
-      // BILL testing with just s3
-      // vols = "accS3nf://racer-a-accumulo/accumulo" + accumuloSuffix;
       cfg.setProperty("instance.volumes", vols);
       cfg.setProperty("general.volume.chooser",
           "org.apache.accumulo.server.fs.PreferredVolumeChooser");
       cfg.setProperty("general.custom.volume.preferred.default",
-          "accS3nf://racer-a-accumulo/accumulo" + accumuloSuffix);
+          "accS3nf://test-bucket/accumulo" + accumuloSuffix);
       cfg.setProperty("general.custom.volume.preferred.logger",
-          "accS3mo://racer-a-accumulo/accumulo-wal" + accumuloSuffix);
+          "accS3mo://test-bucket/accumulo-wal" + accumuloSuffix);
     }
   }
 
