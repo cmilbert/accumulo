@@ -58,7 +58,7 @@ import org.junit.experimental.categories.Category;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.amazon.morocco.mss.file.AccumuloMultiObjectS3FileSystem;
+import org.apache.accumulo.s3.file.AccumuloMultiObjectS3FileSystem;
 import com.google.common.collect.ImmutableMap;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
