@@ -28,7 +28,7 @@ import org.apache.accumulo.core.conf.DefaultConfiguration;
 import org.apache.accumulo.server.fs.VolumeManager;
 import org.apache.accumulo.tserver.TabletServer.ReferencedRemover;
 import org.apache.accumulo.tserver.log.DfsLogger;
-import org.apache.accumulo.tserver.log.DfsLogger.ServerResources;
+import org.apache.accumulo.tserver.log.ServerResources;
 import org.junit.Test;
 
 import com.google.common.collect.Sets;

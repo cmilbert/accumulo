@@ -632,7 +632,7 @@ public class MiniAccumuloClusterImpl implements AccumuloCluster {
   @Override
   public synchronized ServerContext getServerContext() {
     if (context == null) {
-      context = new ServerContext(siteConfig);
+      context = new ServerContext(siteConfig, getConfig().getHadoopConfiguration());
     }
     return context;
   }

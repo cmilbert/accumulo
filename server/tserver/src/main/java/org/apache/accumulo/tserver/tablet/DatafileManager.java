@@ -360,10 +360,10 @@ class DatafileManager {
         if (dfv.getNumEntries() == 0) {
           tablet.getTabletServer().getFileSystem().deleteRecursively(tmpDatafile.path());
         } else {
-          if (tablet.getTabletServer().getFileSystem().exists(newDatafile.path())) {
-            log.warn("Target map file already exist {}", newDatafile);
-            tablet.getTabletServer().getFileSystem().deleteRecursively(newDatafile.path());
-          }
+          // if (tablet.getTabletServer().getFileSystem().exists(newDatafile.path())) {
+          // log.warn("Target map file already exist {}", newDatafile);
+          // tablet.getTabletServer().getFileSystem().deleteRecursively(newDatafile.path());
+          // }
 
           rename(tablet.getTabletServer().getFileSystem(), tmpDatafile.path(), newDatafile.path());
         }
@@ -523,10 +523,10 @@ class DatafileManager {
 
     if (!extent.isRootTablet()) {
 
-      if (tablet.getTabletServer().getFileSystem().exists(newDatafile.path())) {
-        log.error("Target map file already exist " + newDatafile, new Exception());
-        throw new IllegalStateException("Target map file already exist " + newDatafile);
-      }
+      // if (tablet.getTabletServer().getFileSystem().exists(newDatafile.path())) {
+      // log.error("Target map file already exist " + newDatafile, new Exception());
+      // throw new IllegalStateException("Target map file already exist " + newDatafile);
+      // }
 
       // rename before putting in metadata table, so files in metadata table should
       // always exist

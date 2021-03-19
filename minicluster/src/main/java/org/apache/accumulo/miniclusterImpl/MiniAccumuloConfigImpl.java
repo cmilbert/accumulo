@@ -106,6 +106,10 @@ public class MiniAccumuloConfigImpl {
     this.rootPassword = rootPassword;
   }
 
+  public void setHadoopConfiguration(Configuration userConf) {
+    this.hadoopConf = userConf;
+  }
+
   /**
    * Set directories and fully populate site config
    */

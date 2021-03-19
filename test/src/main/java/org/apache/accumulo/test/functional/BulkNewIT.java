@@ -87,6 +87,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  */
 public class BulkNewIT extends SharedMiniClusterBase {
 
+  public static String accumuloSuffix = "_" + System.currentTimeMillis();
+
   @BeforeClass
   public static void setup() throws Exception {
     SharedMiniClusterBase.startMiniClusterWithConfig(new Callback());
@@ -104,6 +106,21 @@ public class BulkNewIT extends SharedMiniClusterBase {
 
       // use raw local file system
       conf.set("fs.file.impl", RawLocalFileSystem.class.getName());
+
+      conf.set("fs.accS3nf.impl",
+          org.apache.accumulo.s3.file.AccumuloNoFlushS3FileSystem.class.getName());
+      conf.set("fs.accS3mo.impl",
+          org.apache.accumulo.s3.file.AccumuloMultiObjectS3FileSystem.class.getName());
+
+      String vols = "file://" + cfg.getDir() + "/accumulo,accS3nf://test-bucket/accumulo"
+          + accumuloSuffix;
+      cfg.setProperty("instance.volumes", vols);
+      cfg.setProperty("general.volume.chooser",
+          "org.apache.accumulo.server.fs.PreferredVolumeChooser");
+      cfg.setProperty("general.custom.volume.preferred.default",
+          "accS3nf://test-bucket/accumulo" + accumuloSuffix);
+      cfg.setProperty("general.custom.volume.preferred.logger",
+          "accS3mo://test-bucket/accumulo-wal" + accumuloSuffix);
     }
   }
 

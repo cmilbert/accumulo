@@ -39,6 +39,7 @@ import org.apache.accumulo.server.security.SecurityUtil;
 import org.apache.accumulo.server.security.delegation.AuthenticationTokenSecretManager;
 import org.apache.accumulo.server.tables.TableManager;
 import org.apache.accumulo.server.tablets.UniqueNameAllocator;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.security.UserGroupInformation;
 
 /**
@@ -57,6 +58,10 @@ public class ServerContext extends ClientContext {
 
   public ServerContext(SiteConfiguration siteConfig) {
     this(new ServerInfo(siteConfig));
+  }
+
+  public ServerContext(SiteConfiguration siteConfig, Configuration hadoopConf) {
+    this(new ServerInfo(siteConfig, hadoopConf));
   }
 
   public ServerContext(SiteConfiguration siteConfig, String instanceName, String zooKeepers,

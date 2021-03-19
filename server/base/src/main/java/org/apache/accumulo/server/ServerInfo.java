@@ -84,9 +84,13 @@ public class ServerInfo implements ClientInfo {
   }
 
   ServerInfo(SiteConfiguration config) {
+    this(config, new Configuration());
+  }
+
+  ServerInfo(SiteConfiguration config, Configuration hadoopConf) {
     SingletonManager.setMode(Mode.SERVER);
     siteConfig = config;
-    hadoopConf = new Configuration();
+    this.hadoopConf = hadoopConf;
     try {
       volumeManager = VolumeManagerImpl.get(siteConfig, hadoopConf);
     } catch (IOException e) {

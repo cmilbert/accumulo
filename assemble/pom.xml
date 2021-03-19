@@ -28,6 +28,11 @@
   <description>Apache Accumulo packages.</description>
   <dependencies>
     <dependency>
+      <groupId>com.amazonaws</groupId>
+      <artifactId>aws-java-sdk-bundle</artifactId>
+      <version>1.11.896</version>
+    </dependency>
+    <dependency>
       <groupId>com.beust</groupId>
       <artifactId>jcommander</artifactId>
       <optional>true</optional>
@@ -196,6 +201,11 @@
       <groupId>org.apache.accumulo</groupId>
       <artifactId>accumulo-native</artifactId>
       <type>tar.gz</type>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.accumulo</groupId>
+      <artifactId>accumulo-s3</artifactId>
       <optional>true</optional>
     </dependency>
     <dependency>

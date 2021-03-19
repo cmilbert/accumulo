@@ -89,6 +89,7 @@
     <module>server/native</module>
     <module>server/tracer</module>
     <module>server/tserver</module>
+    <module>server/s3</module>
     <module>shell</module>
     <module>start</module>
     <module>test</module>
@@ -350,6 +351,11 @@
         <artifactId>accumulo-native</artifactId>
         <version>${project.version}</version>
         <type>tar.gz</type>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.accumulo</groupId>
+        <artifactId>accumulo-s3</artifactId>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.accumulo</groupId>
