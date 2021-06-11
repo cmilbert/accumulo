@@ -43,6 +43,10 @@ public class RecoveryPath {
       walPath = new Path(walPath, FileType.RECOVERY.getDirectory());
       walPath = new Path(walPath, uuid);
 
+      if (walPath.toUri().getScheme().equals("accS3mo")) {
+        walPath = new Path("accS3nf", "", walPath.toUri().getPath());
+      }
+
       return walPath;
     }
 
