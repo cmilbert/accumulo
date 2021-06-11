@@ -105,7 +105,9 @@ public class S3MultiObjectInputStream extends InputStream implements Seekable, P
   }
 
   public void seek(long pos) throws IOException {
-    // throw new UnsupportedOperationException();
+    if(pos != this.pos) {
+      throw new UnsupportedOperationException("Attempted to seek to " + pos);
+    }
   }
 
   public long getPos() throws IOException {
