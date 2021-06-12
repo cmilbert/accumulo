@@ -44,7 +44,7 @@ public class RecoveryPath {
       walPath = new Path(walPath, uuid);
 
       if (walPath.toUri().getScheme().equals("accS3mo")) {
-        walPath = new Path("accS3nf", "", walPath.toUri().getPath());
+        walPath = new Path("accS3nf", walPath.toUri().getAuthority(), walPath.toUri().getPath());
       }
 
       return walPath;
